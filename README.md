@@ -1,4 +1,4 @@
-# SpeedyLabs Dashboard
+# Streamify Dashboard
 
 A modern dashboard application built with React and TypeScript, featuring real-time analytics and data visualization.
 
@@ -31,7 +31,7 @@ A modern dashboard application built with React and TypeScript, featuring real-t
 
 ```bash
 git clone [repository-url]
-cd speedylabs
+cd Streamify
 ```
 
 2. Install dependencies:
