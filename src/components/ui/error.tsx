@@ -1,6 +1,5 @@
-import React from 'react'
-import { AlertCircle } from 'lucide-react' // Import alert icon from Lucide icons
-import { cn } from '@/lib/utils' // Import utility for merging class names
+import { cn } from '@/lib/utils'; // Import utility for merging class names
+import { AlertCircle } from 'lucide-react'; // Import alert icon from Lucide icons
 import { Button } from './button'
 
 // Props interface for the ErrorUi component
