@@ -4,9 +4,7 @@ import RecentSongs from "./components/dashboard/RecentSongs";
 import RevenueDistribution from "./components/dashboard/RevenueDistribution";
 import TopStreamedSongs from "./components/dashboard/TopStreamedSongs";
 import UserGrowth from "./components/dashboard/UserGrowth";
-import { makeServer } from "./lib/server";
 
-makeServer({ environment: "development" });
 
 function App() {
   return (
