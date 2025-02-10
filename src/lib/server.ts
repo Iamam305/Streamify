@@ -68,7 +68,7 @@ export function makeServer({ environment = "development" } = {}): Server {
     factories: {
       user: Factory.extend<Partial<User>>({
         username() {
-          return faker.internet.userName();
+          return faker.person.firstName() + faker.number.int({ min: 1, max: 999 });
         },
         createdAt() {
           return faker.date.past({ years: 1 }).toISOString();
@@ -95,10 +95,10 @@ export function makeServer({ environment = "development" } = {}): Server {
           return faker.date.recent({ days: 60 }).toISOString();
         },
         streamCount() {
-          return faker.number.int({ min: 1000, max: 500000 });
+          return faker.number.int({ min: 100, max: 500 });
         },
         userId() {
-          return faker.number.int({ min: 1, max: 5000 });
+          return faker.number.int({ min: 1, max: 500 });
         },
       }),
       revenue: Factory.extend<Partial<Revenue>>({
@@ -106,17 +106,19 @@ export function makeServer({ environment = "development" } = {}): Server {
           return faker.helpers.arrayElement(["Subscriptions", "Ads", "Merchandise", "Licensing"]);
         },
         amount() {
-          return faker.finance.amount({ min: 1000, max: 100000, dec: 2 });
+          return faker.finance.amount({ min: 100, max: 10000, dec: 2 });
         },
       }),
+
     },
 
     // Seed the database with initial data
     seeds(server) {
-      server.createList("user", 5000);
-      server.createList("stream", 10000);
+      server.createList("user", 500);
+      server.createList("stream", 1000);
       // Create fixed revenue entries for consistent reporting
       server.create("revenue", { source: "Subscriptions", amount: "75000" });
+
       server.create("revenue", { source: "Ads", amount: "45000" });
       server.create("revenue", { source: "Merchandise", amount: "25000" });
       server.create("revenue", { source: "Licensing", amount: "35000" });
