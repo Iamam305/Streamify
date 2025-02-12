@@ -12,7 +12,7 @@ export const fetcher = async <T>(url: string): Promise<T> => {
   return response.data
 }
 
-export const fetcherWithParams = async <T>(url: string, params: Record<string, string | number>): Promise<T> => {
+export const fetcherWithParams = async <T>(url: string, params: Record<string, unknown>): Promise<T> => {
   const response = await axios.get<T>(url, { params })
   return response.data
 }

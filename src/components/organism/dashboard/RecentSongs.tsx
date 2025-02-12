@@ -14,33 +14,48 @@ import { Button } from "../../atoms/ui/button";
 import { ErrorUi } from "../../atoms/ui/error";
 import { Input } from "../../atoms/ui/input";
 import TableComponent from "../../molecules/tableComponent";
+import { RangeDatePicker } from "@/components/atoms/ui/datePicker";
 
-type currentSortFilterType = {
-  sortBy: "songName" | "artist" | "streamCount" | "dateStreamed";
+type SortBy = "songName" | "artist" | "streamCount" | "dateStreamed";
+
+type SortFilter = {
+  sortBy: SortBy;
   sortOrder: "desc" | "asc";
 };
 
-const RecentSongs = () => {
-  // State to manage all filter parameters for the streams data
-  const [currentSortFilter, setCurrentSortFilter] =
-    useState<currentSortFilterType>({
-      sortBy: "dateStreamed",
-      sortOrder: "desc",
-    });
+type Filters = {
+  artist: string;
+  songName: string;
+  limit: number;
+  offset: number;
+  search: string;
+  startDate: Date | null;
+  endDate: Date | null;
+  minStreamCount: string;
+  maxStreamCount: string;
+};
 
-  const [filters, setFilters] = useState({
-    artist: "",
-    songName: "",
-    limit: 10,
-    offset: 0,
-    search: "",
+const INITIAL_FILTERS: Filters = {
+  artist: "",
+  songName: "",
+  limit: 10,
+  offset: 0,
+  search: "",
+  startDate: null,
+  endDate: null,
+  minStreamCount: "",
+  maxStreamCount: "",
+};
+
+const RecentSongs = () => {
+  const [sortFilter, setSortFilter] = useState<SortFilter>({
+    sortBy: "dateStreamed",
+    sortOrder: "desc",
   });
 
-  // Keep track of all loaded streams
+  const [filters, setFilters] = useState<Filters>(INITIAL_FILTERS);
   const [allLoadedStreams, setAllLoadedStreams] = useState<RecentStreamsType[]>([]);
 
-  // Fetch streams data with current filters
-  // Using SWR for data fetching with caching and revalidation
   const {
     data: recentStreams,
     error,
@@ -50,7 +65,9 @@ const RecentSongs = () => {
     () =>
       fetcherWithParams("/api/recent-streams", {
         ...filters,
-        ...currentSortFilter,
+        ...sortFilter,
+        startDate: filters.startDate && filters.endDate ? filters.startDate.toISOString() : null,
+        endDate: filters.startDate && filters.endDate ? filters.endDate.toISOString() : null,
       }),
     {
       revalidateOnFocus: false,
@@ -58,15 +75,18 @@ const RecentSongs = () => {
     }
   );
 
+  const { data: artists } = useSWR<string[]>("/api/artists", fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
+
   useEffect(() => {
-    if (recentStreams) {
-      if (filters.offset === 0) {
-        // Reset loaded streams if filters change
-        setAllLoadedStreams(recentStreams);
-      } else {
-        // Append new streams to existing ones
-        setAllLoadedStreams(prev => [...prev, ...recentStreams]);
-      }
+    if (!recentStreams) return;
+
+    if (filters.offset === 0) {
+      setAllLoadedStreams(recentStreams);
+    } else {
+      setAllLoadedStreams((prev) => [...prev, ...recentStreams]);
     }
   }, [recentStreams, filters.offset]);
 
@@ -74,103 +94,75 @@ const RecentSongs = () => {
     if (filters.offset === 0) {
       refetchRecentStreams();
     }
-  }, [filters, currentSortFilter, refetchRecentStreams]);
+  }, [filters, sortFilter, refetchRecentStreams]);
 
-  // Fetch list of all artists for the filter dropdown
-  const { data: artists } = useSWR<string[]>("/api/artists", fetcher, {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  });
-
-  const handleArtistChange = useCallback((value: string) => {
-    setFilters((prev) => ({
+  const updateFilters = useCallback((updates: Partial<Filters>) => {
+    setFilters(prev => ({
       ...prev,
-      artist: value,
+      ...updates,
       offset: 0,
     }));
   }, []);
 
-  // Increase limit and offset to load more items
   const handleLoadMore = useCallback(() => {
-    setFilters((prev) => ({
+    setFilters(prev => ({
       ...prev,
-      offset: prev.offset + 10,
+      offset: prev.offset + prev.limit,
     }));
   }, []);
 
-  // Handle search input changes
-  const handleSearchChange = useCallback((value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      search: value,
-      offset: 0,
+  const handleSortFilterChange = useCallback((sortBy: SortBy) => {
+    setSortFilter(prev => ({
+      sortBy,
+      sortOrder: prev.sortOrder === "asc" ? "desc" : "asc",
     }));
   }, []);
 
-  // Reset all filters to default values
-  const handleClearFilters = useCallback(() => {
-    setFilters({
-      artist: "",
-      songName: "",
-      limit: 10,
-      offset: 0,
-      search: "",
-    });
-  }, []);
-
-  const handleSortFilterChange = (
-    value: "songName" | "artist" | "streamCount" | "dateStreamed"
-  ) => {
-    console.log(value);
-
-    setCurrentSortFilter((prev) => ({
-      sortBy: value,
-      sortOrder: prev.sortOrder == "asc" ? "desc" : "asc",
-    }));
-  };
-
-  // Memoized artist select items to prevent unnecessary re-renders
   const artistSelectItems = useMemo(() => {
-    return artists?.map((artist) => (
+    return artists?.map(artist => (
       <SelectItem key={artist} value={artist}>
         {artist}
       </SelectItem>
     ));
   }, [artists]);
 
-  const headers = [
+  const headers = useMemo(() => [
     {
       head: "Song Name",
-      icon: currentSortFilter.sortBy === "songName" ? 
-        (currentSortFilter.sortOrder === "asc" ? ChevronUp : ChevronDown) : ChevronDown,
-      onClick: () => handleSortFilterChange("songName")
+      icon: sortFilter.sortBy === "songName" 
+        ? (sortFilter.sortOrder === "asc" ? ChevronUp : ChevronDown)
+        : ChevronDown,
+      onClick: () => handleSortFilterChange("songName"),
     },
     {
       head: "Artist",
-      icon: currentSortFilter.sortBy === "artist" ? 
-        (currentSortFilter.sortOrder === "asc" ? ChevronUp : ChevronDown) : ChevronDown,
-      onClick: () => handleSortFilterChange("artist")
+      icon: sortFilter.sortBy === "artist"
+        ? (sortFilter.sortOrder === "asc" ? ChevronUp : ChevronDown)
+        : ChevronDown,
+      onClick: () => handleSortFilterChange("artist"),
     },
     {
       head: "Date Streamed",
-      icon: currentSortFilter.sortBy === "dateStreamed" ? 
-        (currentSortFilter.sortOrder === "asc" ? ChevronUp : ChevronDown) : ChevronDown,
-      onClick: () => handleSortFilterChange("dateStreamed")
+      icon: sortFilter.sortBy === "dateStreamed"
+        ? (sortFilter.sortOrder === "asc" ? ChevronUp : ChevronDown)
+        : ChevronDown,
+      onClick: () => handleSortFilterChange("dateStreamed"),
     },
     {
       head: "Stream Count",
-      icon: currentSortFilter.sortBy === "streamCount" ? 
-        (currentSortFilter.sortOrder === "asc" ? ChevronUp : ChevronDown) : ChevronDown,
-      onClick: () => handleSortFilterChange("streamCount")
-    }
-  ];
+      icon: sortFilter.sortBy === "streamCount"
+        ? (sortFilter.sortOrder === "asc" ? ChevronUp : ChevronDown)
+        : ChevronDown,
+      onClick: () => handleSortFilterChange("streamCount"),
+    },
+  ], [sortFilter, handleSortFilterChange]);
 
   const tableData = useMemo(() => {
     return allLoadedStreams?.map(stream => [
       stream.songName,
       stream.artist,
       new Date(stream.dateStreamed).toLocaleDateString(),
-      stream.streamCount.toString()
+      stream.streamCount.toString(),
     ]) || [];
   }, [allLoadedStreams]);
 
@@ -178,42 +170,77 @@ const RecentSongs = () => {
 
   return (
     <div className="space-y-4">
-      {/* Filter controls section */}
-      <div className="flex gap-4 justify-between w-full">
-        <div className="flex gap-4">
+      <div className="flex gap-4 justify-between items-end w-full">
+        <div className="flex gap-4 items-end">
           <Input
             placeholder="Search"
             value={filters.search}
-            onChange={(e) => handleSearchChange(e.target.value)}
+            onChange={(e) => updateFilters({ search: e.target.value })}
           />
 
-          <Select onValueChange={handleArtistChange} value={filters.artist}>
+          <Select 
+            onValueChange={(value) => updateFilters({ artist: value })} 
+            value={filters.artist}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Artist" />
             </SelectTrigger>
             <SelectContent>{artistSelectItems}</SelectContent>
           </Select>
+
+          <div className="flex flex-col gap-2 min-w-[200px]">
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">
+                Stream Count Range
+              </span>
+            </div>
+            <div className="flex gap-2">
+              <Input
+                type="number"
+                placeholder="Min"
+                value={filters.minStreamCount}
+                onChange={(e) => updateFilters({ minStreamCount: e.target.value })}
+                className="w-24"
+                min={0}
+                max={500}
+              />
+              <Input
+                type="number"
+                placeholder="Max"
+                value={filters.maxStreamCount}
+                onChange={(e) => updateFilters({ maxStreamCount: e.target.value })}
+                className="w-24"
+                min={0}
+                max={500}
+              />
+            </div>
+          </div>
+
+          <RangeDatePicker
+            startDate={filters.startDate ?? undefined}
+            endDate={filters.endDate ?? undefined}
+            setStartDate={(date) => updateFilters({ startDate: date ?? null })}
+            setEndDate={(date) => updateFilters({ endDate: date ?? null })}
+          />
         </div>
 
         <Button
           variant="outline"
-          onClick={handleClearFilters}
+          onClick={() => setFilters(INITIAL_FILTERS)}
           className="w-[180px]"
         >
           Clear Filters
         </Button>
       </div>
 
-      {/* Data table section */}
       <TableComponent headers={headers} data={tableData} />
 
-      {/* Load more button - only shown if there are potentially more items to load */}
-      {recentStreams && recentStreams.length >= filters.limit && (
+      {allLoadedStreams.length > 0 && (
         <div className="flex justify-center mt-4">
           <Button onClick={handleLoadMore} variant="outline">
             Load More
-          </Button>
-        </div>
+        </Button>
+      </div>
       )}
     </div>
   );

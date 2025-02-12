@@ -269,7 +269,19 @@ export function makeServer({ environment = "development" } = {}): Server {
         let streams = schema.all("stream").models as Array<Stream & { id: string }>;
         
         // Extract query parameters
-        const { artist, songName, sortBy, sortOrder, limit, offset, search } = request.queryParams;
+        const { 
+          artist, 
+          songName, 
+          sortBy, 
+          sortOrder, 
+          limit, 
+          offset, 
+          search,
+          startDate,
+          endDate,
+          minStreamCount,
+          maxStreamCount
+        } = request.queryParams;
         
         // Apply filters based on artist name
         if (artist) {
@@ -291,6 +303,32 @@ export function makeServer({ environment = "development" } = {}): Server {
             stream.songName.toLowerCase().includes((search as string).toLowerCase()) ||
             stream.artist.toLowerCase().includes((search as string).toLowerCase())
           );
+        }
+
+        // Apply date range filters
+        if (startDate) {
+          const start = new Date(startDate as string);
+          streams = streams.filter(stream => 
+            new Date(stream.dateStreamed) >= start
+          );
+        }
+
+        if (endDate) {
+          const end = new Date(endDate as string);
+          streams = streams.filter(stream => 
+            new Date(stream.dateStreamed) <= end
+          );
+        }
+
+        // Apply stream count filters
+        if (minStreamCount) {
+          const min = parseInt(minStreamCount as string);
+          streams = streams.filter(stream => stream.streamCount >= min);
+        }
+
+        if (maxStreamCount) {
+          const max = parseInt(maxStreamCount as string);
+          streams = streams.filter(stream => stream.streamCount <= max);
         }
 
         // Apply sorting based on specified field and order
