@@ -1,8 +1,8 @@
 import { Metrics as MetricsType } from "@/lib/server";
 import { fetcher } from "@/lib/utils";
 import useSWR from "swr";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { ErrorUi } from "../ui/error";
+import { Card, CardContent, CardHeader, CardTitle } from "../../atoms/ui/card";
+import { ErrorUi } from "../../atoms/ui/error";
 import { DollarSign, Users, Play, Activity } from "lucide-react";
 import { useMemo } from "react";
 
@@ -11,7 +11,7 @@ import { useMemo } from "react";
 const METRICS_CONFIG = [
   {
     title: "Total Revenue",
-    valueKey: "revenue", 
+    valueKey: "revenue",
     formatValue: (value: number) => `$${value.toFixed(2)}`, // Format revenue with $ and 2 decimal places
     icon: DollarSign,
   },
@@ -22,7 +22,7 @@ const METRICS_CONFIG = [
     icon: Users,
   },
   {
-    title: "Total Streams", 
+    title: "Total Streams",
     valueKey: "totalStreams",
     formatValue: (value: number) => value,
     icon: Play,

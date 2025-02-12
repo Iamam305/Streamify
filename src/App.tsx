@@ -1,10 +1,9 @@
 import "./App.css";
-import KeyMetrics from "./components/dashboard/KeyMetrics";
-import RecentSongs from "./components/dashboard/RecentSongs";
-import RevenueDistribution from "./components/dashboard/RevenueDistribution";
-import TopStreamedSongs from "./components/dashboard/TopStreamedSongs";
-import UserGrowth from "./components/dashboard/UserGrowth";
-
+import KeyMetrics from "./components/organism/dashboard/KeyMetrics";
+import RecentSongs from "./components/organism/dashboard/RecentSongs";
+import RevenueDistribution from "./components/organism/dashboard/RevenueDistribution";
+import TopStreamedSongs from "./components/organism/dashboard/TopStreamedSongs";
+import UserGrowth from "./components/organism/dashboard/UserGrowth";
 
 function App() {
   return (

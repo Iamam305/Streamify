@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
 import { UserGrowth as UserGrowthType } from "@/lib/server";
 import { fetcher } from "@/lib/utils";
 import useSWR from "swr";
-import { ErrorUi } from "../ui/error";
+import { ErrorUi } from "../../atoms/ui/error";
 
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
@@ -13,14 +13,14 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/atoms/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart";
-import { Skeleton } from "../ui/skeleton";
+} from "@/components/atoms/ui/chart";
+import { Skeleton } from "../../atoms/ui/skeleton";
 import { useMemo } from "react";
 
 const UserGrowth = () => {
@@ -32,31 +32,36 @@ const UserGrowth = () => {
     error,
   } = useSWR<UserGrowthType[]>("/api/user-growth", fetcher, {
     revalidateOnFocus: false,
-    revalidateOnReconnect: false
+    revalidateOnReconnect: false,
   });
 
   // Transform raw data into chart-compatible format
   // Extract month, total users and active users for each data point
-  const chartData = useMemo(() => 
-    userGrowth?.map((item) => ({
-      month: item.month,
-      totalUsers: item.totalUsers,
-      activeUsers: item.activeUsers,
-    })) || []
-  , [userGrowth]);
+  const chartData = useMemo(
+    () =>
+      userGrowth?.map((item) => ({
+        month: item.month,
+        totalUsers: item.totalUsers,
+        activeUsers: item.activeUsers,
+      })) || [],
+    [userGrowth]
+  );
 
   // Define chart configuration with colors and labels
   // Uses CSS variables for consistent theming across the app
-  const chartConfig = useMemo<ChartConfig>(() => ({
-    totalUsers: {
-      label: "Total Users",
-      color: "hsl(var(--chart-1))",
-    },
-    activeUsers: {
-      label: "Active Users", 
-      color: "hsl(var(--chart-2))",
-    },
-  }), []);
+  const chartConfig = useMemo<ChartConfig>(
+    () => ({
+      totalUsers: {
+        label: "Total Users",
+        color: "hsl(var(--chart-1))",
+      },
+      activeUsers: {
+        label: "Active Users",
+        color: "hsl(var(--chart-2))",
+      },
+    }),
+    []
+  );
 
   // Handle error and loading states
   if (error) return <ErrorUi message={error.message} />;

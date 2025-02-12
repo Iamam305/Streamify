@@ -1,38 +1,38 @@
-"use client"
+"use client";
 
-import { RevenueDistribution as RevenueDistributionType } from '@/lib/server';
-import { fetcher } from '@/lib/utils';
-import { useMemo } from 'react';
+import { RevenueDistribution as RevenueDistributionType } from "@/lib/server";
+import { fetcher } from "@/lib/utils";
+import { useMemo } from "react";
 import { Pie, PieChart } from "recharts";
-import useSWR from 'swr';
-import { ErrorUi } from '../ui/error';
-import { Skeleton } from '../ui/skeleton';
+import useSWR from "swr";
+import { ErrorUi } from "../../atoms/ui/error";
+import { Skeleton } from "../../atoms/ui/skeleton";
 
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle
-} from "@/components/ui/card";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/atoms/ui/card";
 import {
-    ChartConfig,
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-} from "@/components/ui/chart";
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/atoms/ui/chart";
 
 const RevenueDistribution = () => {
   // Fetch revenue distribution data using SWR
   // Disable revalidation on focus/reconnect to prevent unnecessary API calls
-  const {data: revenueDistribution, isLoading, error} = useSWR<RevenueDistributionType[]>(
-    "/api/revenue-distribution", 
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false
-    }
-  );
+  const {
+    data: revenueDistribution,
+    isLoading,
+    error,
+  } = useSWR<RevenueDistributionType[]>("/api/revenue-distribution", fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
   // Transform raw data into chart-compatible format
   // Assign different colors to each revenue source using CSS variables
@@ -41,7 +41,7 @@ const RevenueDistribution = () => {
     return revenueDistribution.map((item, index) => ({
       source: item.source,
       amount: item.amount,
-      fill: `hsl(var(--chart-${index+1}))`
+      fill: `hsl(var(--chart-${index + 1}))`,
     }));
   }, [revenueDistribution]);
 
@@ -53,13 +53,13 @@ const RevenueDistribution = () => {
     const config: ChartConfig = {
       amount: {
         label: "Revenue",
-      }
+      },
     };
 
     revenueDistribution.forEach((item, index) => {
       config[item.source] = {
         label: item.source,
-        color: `hsl(var(--chart-${index+1}))`
+        color: `hsl(var(--chart-${index + 1}))`,
       };
     });
 
@@ -93,7 +93,7 @@ const RevenueDistribution = () => {
         </ChartContainer>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default RevenueDistribution
+export default RevenueDistribution;

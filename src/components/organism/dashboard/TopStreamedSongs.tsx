@@ -5,8 +5,8 @@ import { fetcher } from "@/lib/utils";
 import { useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts";
 import useSWR from "swr";
-import { ErrorUi } from "../ui/error";
-import { Skeleton } from "../ui/skeleton";
+import { ErrorUi } from "../../atoms/ui/error";
+import { Skeleton } from "../../atoms/ui/skeleton";
 
 import {
   Card,
@@ -14,13 +14,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/atoms/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart";
+} from "@/components/atoms/ui/chart";
 
 const TopStreamedSongs = () => {
   // Fetch top streamed songs data using SWR
@@ -94,12 +94,8 @@ const TopStreamedSongs = () => {
               tickMargin={10}
               axisLine={false}
               tickFormatter={(value) => value.slice(0, 3)}
-
             />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent   />}
-            />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <Bar dataKey="streams" fill="var(--color-desktop)" radius={8}>
               <LabelList
                 position="top"
