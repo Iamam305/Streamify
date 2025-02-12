@@ -104,12 +104,6 @@ const RecentSongs = () => {
     }));
   }, []);
 
-  const handleLoadMore = useCallback(() => {
-    setFilters(prev => ({
-      ...prev,
-      offset: prev.offset + prev.limit,
-    }));
-  }, []);
 
   const handleSortFilterChange = useCallback((sortBy: SortBy) => {
     setSortFilter(prev => ({
@@ -235,13 +229,7 @@ const RecentSongs = () => {
 
       <TableComponent headers={headers} data={tableData} />
 
-      {allLoadedStreams.length > 0 && (
-        <div className="flex justify-center mt-4">
-          <Button onClick={handleLoadMore} variant="outline">
-            Load More
-        </Button>
-      </div>
-      )}
+    
     </div>
   );
 };
