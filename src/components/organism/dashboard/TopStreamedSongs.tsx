@@ -29,6 +29,7 @@ const TopStreamedSongs = () => {
     data: topStreamedSongs,
     isLoading,
     error,
+    
   } = useSWR<TopStreamedSongsType[]>("/api/top-streamed-songs", fetcher, {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,

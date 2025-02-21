@@ -1,6 +1,7 @@
 import React from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../atoms/ui/table';
 import { Button } from '../atoms/ui/button';
+import { Loader2 } from 'lucide-react';
 
 type TableComponentProps = {
 headers : {
@@ -10,10 +11,11 @@ headers : {
 }[]
 
 data: string[][]
-
+isLoading?:boolean,
+currentSortBy?:string,
 }
 
-const TableComponent = ({ headers, data }: TableComponentProps) => {
+const TableComponent = ({ headers, data, isLoading, currentSortBy }: TableComponentProps) => {
   if (data.length === 0) {
     return (
       <div className="w-full h-[300px] border-2 border-dashed rounded-lg flex items-center justify-center text-muted-foreground">
@@ -23,7 +25,7 @@ const TableComponent = ({ headers, data }: TableComponentProps) => {
   }
 
   return (
-    <Table className="border rounded-lg ">
+    <Table className="border rounded-lg overflow-x-scroll lg:overflow-x-hidden">
       <TableHeader>
         <TableRow className="bg-muted/50 hover:bg-muted/50">
           {headers.map((header, index) => (
@@ -35,6 +37,7 @@ const TableComponent = ({ headers, data }: TableComponentProps) => {
               >
                 <span>{header.head}</span>
                 <header.icon/>
+                <span>{(isLoading && currentSortBy == header.head) ? <Loader2 className="w-4 h-4 animate-spin" /> : null}</span>
               </Button>
             </TableHead>
           ))}

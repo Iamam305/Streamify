@@ -6,31 +6,43 @@ import { ErrorUi } from "../../atoms/ui/error";
 import { DollarSign, Users, Play, Activity } from "lucide-react";
 import { useMemo } from "react";
 
-// Configuration for each metric card, defined outside component to avoid recreation on each render
+// Configuration for each metric card, defined outside component to avoidrecreation on each render
 // Each metric has a title, key to access data, value formatter, and icon
+
+// new Intl.NumberFormat("en-IN", { maximumSignificantDigits: 3 }).format(
+//   number,
+// )
+const formatNums = (value: number) =>
+  new Intl.NumberFormat("en-IN", { maximumSignificantDigits: 3 }).format(
+    value
+  );
+
+// const formatCurrency = (value: number) =>  new Intl.NumberFormat("ja-JP", { style: "currency", currency: "USD" }).format(
+//   value,
+// );
 const METRICS_CONFIG = [
   {
     title: "Total Revenue",
     valueKey: "revenue",
-    formatValue: (value: number) => `$${value.toFixed(2)}`, // Format revenue with $ and 2 decimal places
+    formatValue: (value: number) => formatNums(value), // Format revenue with $ and 2 decimal places
     icon: DollarSign,
   },
   {
     title: "Total Users",
     valueKey: "totalUsers",
-    formatValue: (value: number) => value,
+    formatValue: (value: number) => formatNums(value),
     icon: Users,
   },
   {
     title: "Total Streams",
     valueKey: "totalStreams",
-    formatValue: (value: number) => value,
+    formatValue: (value: number) => formatNums(value),
     icon: Play,
   },
   {
     title: "Active Users",
     valueKey: "activeUsers",
-    formatValue: (value: number) => value,
+    formatValue: (value: number) => formatNums(value),
     icon: Activity,
   },
 ] as const; // Use const assertion to ensure type safety

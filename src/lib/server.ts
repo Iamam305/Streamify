@@ -337,13 +337,13 @@ export function makeServer({ environment = "development" } = {}): Server {
             const order = sortOrder === 'desc' ? -1 : 1;
             
             switch(sortBy) {
-              case 'dateStreamed':
+              case 'Date Streamed':
                 return order * (new Date(b.dateStreamed).getTime() - new Date(a.dateStreamed).getTime());
-              case 'streamCount':
+              case 'Stream Count':
                 return order * (b.streamCount - a.streamCount);
-              case 'artist':
+              case 'Artist':
                 return order * a.artist.localeCompare(b.artist);
-              case 'songName':
+              case 'Song Name':
                 return order * a.songName.localeCompare(b.songName);
               default:
                 return 0;
